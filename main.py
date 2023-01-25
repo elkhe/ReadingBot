@@ -1,3 +1,4 @@
+import telebot
 from database.client import PgClient
 from database.sql_commands import DatabaseCommands
 from database.db_config import host, db_name, password, user
