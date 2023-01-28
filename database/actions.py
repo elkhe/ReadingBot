@@ -6,9 +6,9 @@ class Database(DatabaseCommands):
     def __init__(self, database_client: PgClient) -> None:
         self.database_client = database_client
 
-    def setup(self, setup):
+    def setup(self):
         self.database_client.create_conn()
-
+    
     def shutdown(self):
         self.database_client.close_conn()
     

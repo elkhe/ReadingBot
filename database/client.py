@@ -1,15 +1,19 @@
 import psycopg2
 
 class PgClient:
-    def __init__(self) -> None:
+    def __init__(self, host, db_name, password, user) -> None:
         self.conn = None
+        self.host = host
+        self.db_name = db_name  
+        self.password = password
+        self.user = user
     
-    def create_conn(self, host, db_name, password, user):
+    def create_conn(self):
         self.conn = psycopg2.connect(
-            host=host,
-            database=db_name,
-            password=password,
-            user=user
+            host=self.host,
+            database=self.db_name,
+            password=self.password,
+            user=self.user
         )
     
     def close_conn(self):

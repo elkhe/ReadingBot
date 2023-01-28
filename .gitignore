@@ -1,3 +1,5 @@
 .venv
 .vscode
 .env
+test.py
+__pycahe__
