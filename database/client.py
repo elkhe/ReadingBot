@@ -27,5 +27,5 @@ class PgClient:
     def execute_select_command(self, command: str, params: tuple):
         with self.conn:
             cursor = self.conn.cursor()
-            cursor.execute(command, params)
+            cursor.execute(command, (params, ))
             return cursor.fetchall()
