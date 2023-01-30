@@ -1,6 +1,6 @@
 import telebot
 from telebot.types import Message
-from datetime import date
+from datetime import date, datetime
 
 from database.client import PgClient
 from database.db_config import host, db_name, password, user
@@ -8,7 +8,6 @@ from database.actions import Database
 
 from telegram.config import TOKEN, ADMIN_CHAT_ID, BASE_URL
 from telegram.client import TelegramClient
-
 
 
 class ReadingBot(telebot.TeleBot):
@@ -35,7 +34,12 @@ def start(message: Message):
     create_new_user = False
     user = bot.database.get_user(user_id=str(user_id))
     if not user:
-        bot.database.create_user(user_id=str(user_id), username=username, chat_id=str(chat_id), state=False, last_visit=date.today())
+        bot.database.create_user(
+                                user_id=str(user_id), 
+                                username=username, 
+                                chat_id=str(chat_id), 
+                                state=False, 
+                                last_visit=datetime.now())
         create_new_user = True
     bot.reply_to(message=message, text=f"Вы {'уже ' if not create_new_user else ' '}зарегистрированы,  {username}!")
 
@@ -44,24 +48,39 @@ def add_to_active_list(message: Message):
     """
     Get bookname. Get author. Check bookname in active_list. Add to active list if absent.
     Check bookname in books. Add to books if absent. 
-
     """
-    bot.send_message("Введите название книги")
-    bot.register_next_step_handler(get_bookname)
+    bot.send_message(chat_id=message.chat.id, text="Введите название книги")
+    bot.register_next_step_handler(message, get_bookname)
 
 def get_bookname(message: Message):
-    bookname = message.text
-    bot.send_message("Введите имя автора в формате Фамилия Имя Отчество. Например, Набиуллина Эльвира Сахипзадовна")
-    bot.register_next_step_handler(get_author, bookname)
+    bot.send_message(chat_id=message.chat.id, text="Введите имя автора")
+    bot.register_next_step_handler(message, add_data_to_active_list, bookname=message.text)
 
-def get_author(message: Message, bookname):
+def add_data_to_active_list(message: Message, bookname):
     author = message.text
-    bot.register_next_step_handler(add_data_to_active_list, bookname=bookname, author=author)
+    book = bot.database.get_book(bookname, author)
+    print(book)
+    if book:
+        book_id = book[0]
+        book_in_al = bot.database.get_book_from_alist(book_id=book_id)
+        if book_in_al:
+            bot.send_message(chat_id=message.chat.id, text='Эта книга уже есть в вашем активном списке')
+        else:
+            bot.database.add_book_to_alist(
+                                            started_reading=datetime.now(),
+                                            user_id=message.from_user.id,
+                                            book_id=book_id)
+            bot.send_message(chat_id=message.chat.id, text='Книга добавлена в ваш активный список')
+    else:
+        bot.database.create_book(book_name=bookname, author_name=author)
+        book_id = bot.database.get_book(bookname, author)
+        bot.database.add_book_to_alist(
+                                started_reading=datetime.now(),
+                                user_id=message.from_user.id,
+                                book_id=book_id)
+        bot.send_message(chat_id=message.chat.id, text='Книга создана и добавлена в ваш активный список')
 
-def add_data_to_active_list(message, bookname, author):
-    """
-    
-    """
+
 
 
 
