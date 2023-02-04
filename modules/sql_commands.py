@@ -1,10 +1,10 @@
 CREATE_USER = """
-    INSERT INTO users(user_id, username, chat_id, state, last_visit) 
+    INSERT INTO users(user_id, username, chat_id, book_id, last_visit) 
     VALUES (%s, %s, %s, %s, %s); 
 """
 
 GET_USER = """
-    SELECT user_id, username, chat_id, state, last_visit 
+    SELECT user_id, username, chat_id, book_id , last_visit 
       FROM users
      WHERE user_id = %s;
 """
@@ -19,7 +19,7 @@ GET_BOOK_FROM_ACTIVE_LIST = """
     SELECT user_book_id
         FROM users INNER JOIN active_list
             ON users.user_id = active_list.user_id
-        WHERE book_id = %s;
+        WHERE active_list.book_id = %s;
 """
 
 #book_id int -> serial
@@ -45,4 +45,10 @@ GET_ACTIVE_LIST = """
 DELETE_FROM_ALIST = """
     DELETE FROM active_list 
     WHERE book_id = %s;
+"""
+
+UPDATE_ACTIVE_BOOK = """
+    UPDATE users 
+    SET book_id = %s
+    WHERE user_id = %s;
 """
