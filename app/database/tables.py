@@ -1,21 +1,23 @@
 #users user_id serial -> int 
 CREATE_TABLE = {
+    "books": """
+        CREATE TABLE IF NOT EXISTS books (
+            book_id SERIAL PRIMARY KEY,
+            book_name VARCHAR(50) NOT NULL,
+            author_name VARCHAR(30)
+        );""",
+
+
     "users": """
         CREATE TABLE IF NOT EXISTS users (
             user_id INT PRIMARY KEY,
             username VARCHAR(50) UNIQUE NOT NULL,
             chat_id INT,
-            state BOOLEAN,
-            last_visit DATE
+            book_id INT,
+            last_visit DATE,
+            FOREIGN KEY(book_id) REFERENCES books(book_id)
         );""",
 
-    "books": """
-        CREATE TABLE IF NOT EXISTS books (
-            book_id SERIAL PRIMARY KEY,
-            book_name VARCHAR(100) NOT NULL,
-            author_name VARCHAR(30),
-            book_info TEXT
-        );""",
 
     "user_book": """
         CREATE TABLE IF NOT EXISTS user_book (
@@ -42,6 +44,7 @@ CREATE_TABLE = {
     "notes": """
         CREATE TABLE IF NOT EXISTS notes (
             note_id SERIAL PRIMARY KEY,
+            title VARCHAR(50), 
             note_text TEXT,
             note_number INT,
             note_date DATE,
@@ -62,3 +65,6 @@ CREATE_TABLE = {
         );"""
 }
 
+DELETE_TABLE_USERS = """
+    DROP TABLE users, books, reviews, notes, user_book, active_list;
+"""

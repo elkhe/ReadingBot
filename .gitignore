@@ -2,6 +2,7 @@
 .vscode
 .env
 test.py
-__pycahe__
+__pycache__/
 .cpython
-
+*.py[cod]
+todo.txt
